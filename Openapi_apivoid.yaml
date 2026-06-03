@@ -7,18 +7,18 @@ info:
     investigations to determine if a URL, domain, or IP address has been
     flagged as malicious, phishing, spam, or suspicious, or to find out when
     a domain was registered and whether it is newly created.
-  version: "1.0"
+  version: "2.0"
 
 servers:
-  - url: https://api.apivoid.com
+  - url: https://api.apivoid.com/v2
 
 security:
-  - ApiKeyAuth: []
+  - ApiKeyHeader: []
 
 paths:
 
-  /v2/url-reputation:
-    get:
+  /url-reputation:
+    post:
       operationId: CheckUrlReputation
       summary: Check URL reputation and scan for malicious or phishing content
       description: >
@@ -33,15 +33,18 @@ paths:
         against 30+ threat intelligence engines. Returns safety score, risk score,
         and detection details. Use for prompts like: check URL reputation, scan link,
         is this URL malicious, is this a phishing link.
-      parameters:
-        - name: url
-          in: query
-          required: true
-          description: >
-            The full URL to scan for reputation (e.g. https://example.com/path).
-            Include the full URL with protocol prefix.
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  description: The full URL to scan for reputation (e.g. https://example.com/path).
       responses:
         "200":
           description: URL reputation result
@@ -50,14 +53,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/UrlReputationResponse'
         "400":
-          description: Bad request – missing or invalid parameters
+          description: Bad request
         "401":
           description: Unauthorized – invalid API key
-        "402":
-          description: Insufficient credits
 
-  /v2/domain-age:
-    get:
+  /domain-age:
+    post:
       operationId: CheckDomainAge
       summary: Check domain age, registration date, and whether it is newly registered
       description: >
@@ -75,15 +76,20 @@ paths:
         malicious activity. Returns registration date, expiration date, and age in days,
         months, and years. Use for prompts like: check domain age, when was domain registered,
         is this domain newly registered, how old is this domain, domain registration date.
-      parameters:
-        - name: host
-          in: query
-          required: true
-          description: >
-            The domain name to check the age or registration date of (e.g. google.com,
-            example.org). Do not include http:// or https://, just the domain name.
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - host
+              properties:
+                host:
+                  type: string
+                  description: >
+                    The domain name to check (e.g. google.com). Do not include
+                    http:// or https://, just the bare domain name.
       responses:
         "200":
           description: Domain age and registration result
@@ -96,8 +102,8 @@ paths:
         "401":
           description: Unauthorized
 
-  /v2/domain-reputation:
-    get:
+  /domain-reputation:
+    post:
       operationId: CheckDomainReputation
       summary: Check domain reputation and blacklist status across 100+ threat feeds
       description: >
@@ -112,15 +118,20 @@ paths:
         malicious, phishing, or spam. Returns detection ratio and per-engine results.
         Use for prompts like: check domain reputation, is domain malicious, is domain
         blacklisted, domain threat check, domain blocklist lookup.
-      parameters:
-        - name: host
-          in: query
-          required: true
-          description: >
-            The domain name to check reputation for (e.g. example.com).
-            Do not include http:// or https://, just the domain name.
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - host
+              properties:
+                host:
+                  type: string
+                  description: >
+                    The domain name to check (e.g. example.com). Do not include
+                    http:// or https://, just the bare domain name.
       responses:
         "200":
           description: Domain reputation and blacklist result
@@ -133,8 +144,8 @@ paths:
         "401":
           description: Unauthorized
 
-  /v2/ip-reputation:
-    get:
+  /ip-reputation:
+    post:
       operationId: CheckIPReputation
       summary: Check IP address reputation for malicious activity, proxies, Tor, and VPNs
       description: >
@@ -149,13 +160,18 @@ paths:
         open proxies, Tor exit nodes, VPNs, and spam. Returns risk flags and blacklist results.
         Use for prompts like: check IP reputation, is this IP malicious, IP threat lookup,
         is this IP a proxy or Tor node.
-      parameters:
-        - name: ip
-          in: query
-          required: true
-          description: The IPv4 or IPv6 address to check reputation for.
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ip
+              properties:
+                ip:
+                  type: string
+                  description: The IPv4 or IPv6 address to check reputation for.
       responses:
         "200":
           description: IP reputation result
@@ -170,141 +186,80 @@ paths:
 
 components:
   securitySchemes:
-    ApiKeyAuth:
+    ApiKeyHeader:
       type: apiKey
-      in: query
-      name: key
+      in: header
+      name: X-API-Key
 
   schemas:
 
     UrlReputationResponse:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            report:
-              type: object
-              properties:
-                url:
-                  type: string
-                  description: The URL that was scanned.
-                safety_score:
-                  type: integer
-                  description: Safety score from 0 (dangerous) to 100 (safe).
-                risk_score:
-                  type: integer
-                  description: Risk score from 0 (safe) to 100 (high risk).
-                detections:
-                  type: object
-                  properties:
-                    count:
-                      type: integer
-                      description: Number of engines that flagged the URL.
-                    engines_count:
-                      type: integer
-                      description: Total engines checked.
-                    engines:
-                      type: object
-                      description: Per-engine detection results.
-                categories:
-                  type: object
-                  description: URL categories from various feeds.
-                domain_blacklist:
-                  type: object
-                  description: Blacklist status of the domain in the URL.
-        credits_remained:
-          type: number
-          description: Remaining API credits.
+        url:
+          type: string
+        safety_score:
+          type: integer
+          description: Safety score from 0 (dangerous) to 100 (safe).
+        risk_score:
+          type: integer
+          description: Risk score from 0 (safe) to 100 (high risk).
+        detections:
+          type: integer
+          description: Number of engines that flagged the URL.
+        engines_count:
+          type: integer
+          description: Total engines checked.
 
     DomainAgeResponse:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            domain_age:
-              type: object
-              properties:
-                found:
-                  type: boolean
-                domain:
-                  type: string
-                registration_date:
-                  type: string
-                  format: date
-                  description: The date the domain was first registered.
-                expiration_date:
-                  type: string
-                  format: date
-                  description: The date the domain registration expires.
-                domain_age_in_days:
-                  type: integer
-                  description: How many days old the domain is since registration.
-                domain_age_in_months:
-                  type: integer
-                  description: How many months old the domain is since registration.
-                domain_age_in_years:
-                  type: integer
-                  description: How many years old the domain is since registration.
-        credits_remained:
-          type: number
+        host:
+          type: string
+        domain_age_found:
+          type: boolean
+        domain_registered:
+          type: string
+        domain_creation_date:
+          type: string
+          format: date
+          description: The date the domain was first registered.
+        domain_age_in_days:
+          type: integer
+          description: How many days old the domain is since registration.
+        domain_age_in_months:
+          type: integer
+          description: How many months old the domain is since registration.
+        domain_age_in_years:
+          type: integer
+          description: How many years old the domain is since registration.
 
     DomainBlacklistResponse:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            report:
-              type: object
-              properties:
-                host:
-                  type: string
-                blacklists:
-                  type: object
-                  properties:
-                    engines_count:
-                      type: integer
-                    detections:
-                      type: integer
-                    engines:
-                      type: object
-                      description: Per-engine detection results.
-                    detection_rate:
-                      type: string
-        credits_remained:
-          type: number
+        host:
+          type: string
+        detections:
+          type: integer
+        engines_count:
+          type: integer
+        detection_rate:
+          type: string
 
     IPReputationResponse:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            report:
-              type: object
-              properties:
-                ip:
-                  type: string
-                is_proxy:
-                  type: boolean
-                is_tor:
-                  type: boolean
-                is_vpn:
-                  type: boolean
-                is_hosting:
-                  type: boolean
-                blacklists:
-                  type: object
-                  properties:
-                    engines_count:
-                      type: integer
-                    detections:
-                      type: integer
-                    detection_rate:
-                      type: string
-                    engines:
-                      type: object
-        credits_remained:
-          type: number
+        ip:
+          type: string
+        is_proxy:
+          type: boolean
+        is_tor:
+          type: boolean
+        is_vpn:
+          type: boolean
+        is_hosting:
+          type: boolean
+        detections:
+          type: integer
+        engines_count:
+          type: integer
