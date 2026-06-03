@@ -1,0 +1,310 @@
+openapi: 3.0.1
+info:
+  title: APIVoid Reputation API
+  description: >
+    APIVoid threat intelligence API for checking URL reputation, domain
+    reputation, domain age, and IP reputation. Use these skills during security
+    investigations to determine if a URL, domain, or IP address has been
+    flagged as malicious, phishing, spam, or suspicious, or to find out when
+    a domain was registered and whether it is newly created.
+  version: "1.0"
+
+servers:
+  - url: https://api.apivoid.com
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+
+  /v2/url-reputation:
+    get:
+      operationId: CheckUrlReputation
+      summary: Check URL reputation and scan for malicious or phishing content
+      description: >
+        Use this skill to check, scan, or analyze the reputation of a URL or web address.
+        Scans the URL against 30+ security engines and threat intelligence feeds to determine
+        if it is malicious, phishing, spam, or clean. Returns a safety score, risk score,
+        detection ratio, URL category, and per-engine breakdown. Use when a user asks:
+        "is this URL safe?", "scan this link", "check if this URL is malicious",
+        "is this a phishing URL?", or "what is the reputation of this web address?".
+      x-ms-skill-description: >
+        Checks whether a URL is malicious, phishing, spam, or safe by scanning it
+        against 30+ threat intelligence engines. Returns safety score, risk score,
+        and detection details. Use for prompts like: check URL reputation, scan link,
+        is this URL malicious, is this a phishing link.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: >
+            The full URL to scan for reputation (e.g. https://example.com/path).
+            Include the full URL with protocol prefix.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: URL reputation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UrlReputationResponse'
+        "400":
+          description: Bad request – missing or invalid parameters
+        "401":
+          description: Unauthorized – invalid API key
+        "402":
+          description: Insufficient credits
+
+  /v2/domain-age:
+    get:
+      operationId: CheckDomainAge
+      summary: Check domain age, registration date, and whether it is newly registered
+      description: >
+        Use this skill to find out how old a domain is, when it was registered,
+        when it expires, and whether it is a newly registered domain. Newly registered
+        domains are commonly used in phishing, malware, and fraud campaigns.
+        Returns the registration date, expiration date, and domain age in days, months,
+        and years. Use when a user asks: "how old is this domain?", "when was this domain
+        registered?", "is this a newly registered domain?", "check domain age",
+        "is this domain new?", "what is the registration date of this domain?",
+        "identify if domain is newly created", or "domain age lookup".
+      x-ms-skill-description: >
+        Looks up the age and registration date of a domain name to determine if it is
+        newly registered. Newly created domains are a common indicator of phishing or
+        malicious activity. Returns registration date, expiration date, and age in days,
+        months, and years. Use for prompts like: check domain age, when was domain registered,
+        is this domain newly registered, how old is this domain, domain registration date.
+      parameters:
+        - name: host
+          in: query
+          required: true
+          description: >
+            The domain name to check the age or registration date of (e.g. google.com,
+            example.org). Do not include http:// or https://, just the domain name.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain age and registration result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainAgeResponse'
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+
+  /v2/domain-reputation:
+    get:
+      operationId: CheckDomainReputation
+      summary: Check domain reputation and blacklist status across 100+ threat feeds
+      description: >
+        Use this skill to check the reputation of a domain name against 100+ domain
+        blacklists and threat intelligence feeds. Identifies malicious, spam, or phishing
+        domains. Returns detection count, detection rate, and per-engine breakdown.
+        Use when a user asks: "is this domain malicious?", "check domain reputation",
+        "is this domain blacklisted?", "is this domain safe?", "domain threat intelligence",
+        "has this domain been flagged?", or "check if domain is on a blocklist".
+      x-ms-skill-description: >
+        Checks a domain against 100+ blacklists and threat feeds to identify if it is
+        malicious, phishing, or spam. Returns detection ratio and per-engine results.
+        Use for prompts like: check domain reputation, is domain malicious, is domain
+        blacklisted, domain threat check, domain blocklist lookup.
+      parameters:
+        - name: host
+          in: query
+          required: true
+          description: >
+            The domain name to check reputation for (e.g. example.com).
+            Do not include http:// or https://, just the domain name.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Domain reputation and blacklist result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainBlacklistResponse'
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+
+  /v2/ip-reputation:
+    get:
+      operationId: CheckIPReputation
+      summary: Check IP address reputation for malicious activity, proxies, Tor, and VPNs
+      description: >
+        Use this skill to check the reputation of an IP address against threat intelligence
+        feeds. Detects malicious IPs, open proxies, Tor exit nodes, VPNs, hosting providers,
+        and spam sources. Returns is_proxy, is_tor, is_vpn, is_hosting flags and blacklist
+        detection details. Use when a user asks: "is this IP malicious?", "check IP reputation",
+        "is this IP a Tor exit node?", "is this IP a proxy?", "IP threat intelligence",
+        "is this IP address dangerous?", or "IP address lookup".
+      x-ms-skill-description: >
+        Checks an IP address against threat intelligence feeds for malicious activity,
+        open proxies, Tor exit nodes, VPNs, and spam. Returns risk flags and blacklist results.
+        Use for prompts like: check IP reputation, is this IP malicious, IP threat lookup,
+        is this IP a proxy or Tor node.
+      parameters:
+        - name: ip
+          in: query
+          required: true
+          description: The IPv4 or IPv6 address to check reputation for.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: IP reputation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IPReputationResponse'
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+
+  schemas:
+
+    UrlReputationResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            report:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: The URL that was scanned.
+                safety_score:
+                  type: integer
+                  description: Safety score from 0 (dangerous) to 100 (safe).
+                risk_score:
+                  type: integer
+                  description: Risk score from 0 (safe) to 100 (high risk).
+                detections:
+                  type: object
+                  properties:
+                    count:
+                      type: integer
+                      description: Number of engines that flagged the URL.
+                    engines_count:
+                      type: integer
+                      description: Total engines checked.
+                    engines:
+                      type: object
+                      description: Per-engine detection results.
+                categories:
+                  type: object
+                  description: URL categories from various feeds.
+                domain_blacklist:
+                  type: object
+                  description: Blacklist status of the domain in the URL.
+        credits_remained:
+          type: number
+          description: Remaining API credits.
+
+    DomainAgeResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            domain_age:
+              type: object
+              properties:
+                found:
+                  type: boolean
+                domain:
+                  type: string
+                registration_date:
+                  type: string
+                  format: date
+                  description: The date the domain was first registered.
+                expiration_date:
+                  type: string
+                  format: date
+                  description: The date the domain registration expires.
+                domain_age_in_days:
+                  type: integer
+                  description: How many days old the domain is since registration.
+                domain_age_in_months:
+                  type: integer
+                  description: How many months old the domain is since registration.
+                domain_age_in_years:
+                  type: integer
+                  description: How many years old the domain is since registration.
+        credits_remained:
+          type: number
+
+    DomainBlacklistResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            report:
+              type: object
+              properties:
+                host:
+                  type: string
+                blacklists:
+                  type: object
+                  properties:
+                    engines_count:
+                      type: integer
+                    detections:
+                      type: integer
+                    engines:
+                      type: object
+                      description: Per-engine detection results.
+                    detection_rate:
+                      type: string
+        credits_remained:
+          type: number
+
+    IPReputationResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            report:
+              type: object
+              properties:
+                ip:
+                  type: string
+                is_proxy:
+                  type: boolean
+                is_tor:
+                  type: boolean
+                is_vpn:
+                  type: boolean
+                is_hosting:
+                  type: boolean
+                blacklists:
+                  type: object
+                  properties:
+                    engines_count:
+                      type: integer
+                    detections:
+                      type: integer
+                    detection_rate:
+                      type: string
+                    engines:
+                      type: object
+        credits_remained:
+          type: number
