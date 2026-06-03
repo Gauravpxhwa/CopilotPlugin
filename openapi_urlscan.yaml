@@ -1,0 +1,353 @@
+openapi: 3.0.1
+info:
+  title: URLScan.io API
+  description: >
+    URLScan.io API for submitting URLs for scanning, retrieving scan results,
+    and searching for historical scans of URLs, domains, and hostnames.
+    Use these skills during security investigations to analyze suspicious URLs,
+    check if a domain has been scanned before, and retrieve detailed scan reports
+    including page behaviour, network requests, and threat verdicts.
+  version: "1.0"
+
+servers:
+  - url: https://urlscan.io
+
+security:
+  - ApiKeyHeader: []
+
+paths:
+
+  /api/v1/scan:
+    post:
+      operationId: SubmitUrlScan
+      summary: Submit a URL for scanning and threat analysis
+      description: >
+        Use this skill to submit, scan, or analyze a URL using URLScan.io.
+        Submits the URL for a full browser-based scan that captures network
+        requests, page behaviour, screenshots, DOM snapshots, and threat verdicts.
+        Returns a scan UUID that can be used to retrieve results after 10-30 seconds.
+        Use when a user asks: "scan this URL", "submit this URL for scanning",
+        "analyze this link", "check if this URL is malicious using urlscan",
+        "run a urlscan on this URL", or "scan this website for threats".
+      x-ms-skill-description: >
+        Submits a URL to URLScan.io for a full browser-based threat scan. Returns
+        a scan ID to retrieve results. Use for prompts like: scan this URL, submit URL
+        for scanning, analyze this link with urlscan, check if URL is malicious.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  description: The full URL to scan including protocol (e.g. https://example.com).
+                visibility:
+                  type: string
+                  enum: [public, unlisted, private]
+                  default: public
+                  description: >
+                    Visibility of the scan result. Use 'public' for normal scans,
+                    'private' for sensitive or confidential URLs.
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: Optional user-defined tags to annotate the scan (e.g. phishing, malware).
+                country:
+                  type: string
+                  description: >
+                    ISO 3166-1 alpha-2 country code to scan from (e.g. US, DE, GB).
+                    If not supplied, an appropriate country is chosen automatically.
+      responses:
+        "200":
+          description: Scan submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanSubmitResponse'
+        "400":
+          description: Bad request – invalid URL or parameters
+        "401":
+          description: Unauthorized – invalid or missing API key
+        "429":
+          description: Rate limit exceeded
+
+  /api/v1/result/{scanId}/:
+    get:
+      operationId: GetScanResult
+      summary: Retrieve the full scan result and threat verdict for a submitted URL scan
+      description: >
+        Use this skill to retrieve, get, or fetch the result of a previously submitted
+        URLScan.io scan using its scan ID or UUID. Returns the full scan report including
+        threat verdict, malicious indicators, page title, IP address, ASN, certificates,
+        network requests, cookies, and console messages. Poll after waiting at least
+        10-30 seconds from submission. Use when a user asks: "get scan result",
+        "retrieve urlscan result", "what are the results for scan ID X",
+        "show me the urlscan report", or "fetch the threat verdict for this scan".
+      x-ms-skill-description: >
+        Retrieves the full threat analysis report for a URLScan.io scan by scan ID.
+        Returns verdict, malicious indicators, page info, network requests, and more.
+        Use for prompts like: get scan result, retrieve urlscan report, show threat
+        verdict for scan ID, fetch urlscan results.
+      parameters:
+        - name: scanId
+          in: path
+          required: true
+          description: The UUID of the scan returned by the Submit URL Scan operation.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Scan result retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanResultResponse'
+        "404":
+          description: Scan not found or still in progress – wait and retry
+        "401":
+          description: Unauthorized
+
+  /api/v1/search/:
+    get:
+      operationId: SearchScans
+      summary: Search historical URLScan.io scans for a domain, URL, IP, or hostname
+      description: >
+        Use this skill to search, look up, or find historical scan results for a
+        domain, URL, IP address, hostname, or hash on URLScan.io. Supports Elasticsearch
+        query syntax. Returns a list of matching scans with their verdict, timestamp,
+        country, and page metadata. Use when a user asks: "search urlscan for domain X",
+        "has this domain been scanned before?", "find scans for this IP",
+        "look up urlscan history for this URL", "find historical scans for this hostname",
+        or "check if this domain appears in urlscan".
+      x-ms-skill-description: >
+        Searches URLScan.io's historical scan database for a domain, URL, IP, or hostname.
+        Returns matching scans with verdicts and metadata. Use for prompts like: search urlscan
+        for domain, has this domain been scanned, find scans for IP, urlscan history lookup,
+        check domain in urlscan.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: >
+            Search query using Elasticsearch syntax. Examples:
+            domain:google.com, page.ip:1.2.3.4, page.url:https://example.com,
+            task.tags:phishing, verdicts.overall.malicious:true
+          schema:
+            type: string
+        - name: size
+          in: query
+          required: false
+          description: Number of results to return (default 100, max 10000).
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          required: false
+          description: Sort order for results (default _score, use date for newest first).
+          schema:
+            type: string
+            default: date
+      responses:
+        "200":
+          description: Search results returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        "400":
+          description: Bad request – invalid query syntax
+        "401":
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    ApiKeyHeader:
+      type: apiKey
+      in: header
+      name: api-key
+
+  schemas:
+
+    ScanSubmitResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Confirmation message.
+        uuid:
+          type: string
+          description: The unique scan ID to use when retrieving results.
+        result:
+          type: string
+          description: URL to view the scan result in the browser.
+        api:
+          type: string
+          description: API endpoint to retrieve the scan result programmatically.
+        visibility:
+          type: string
+          description: Visibility of the submitted scan.
+        options:
+          type: object
+          description: Options applied to the scan.
+        url:
+          type: string
+          description: The URL that was submitted for scanning.
+        country:
+          type: string
+          description: Country the scan was performed from.
+
+    ScanResultResponse:
+      type: object
+      properties:
+        task:
+          type: object
+          properties:
+            uuid:
+              type: string
+            url:
+              type: string
+            time:
+              type: string
+              format: date-time
+            visibility:
+              type: string
+            country:
+              type: string
+        page:
+          type: object
+          properties:
+            url:
+              type: string
+            domain:
+              type: string
+            ip:
+              type: string
+            ptr:
+              type: string
+            asn:
+              type: string
+            asnname:
+              type: string
+            country:
+              type: string
+            title:
+              type: string
+            status:
+              type: string
+        verdicts:
+          type: object
+          properties:
+            overall:
+              type: object
+              properties:
+                score:
+                  type: integer
+                  description: Overall threat score.
+                malicious:
+                  type: boolean
+                  description: Whether the URL was determined to be malicious.
+                hasVerdicts:
+                  type: boolean
+                categories:
+                  type: array
+                  items:
+                    type: string
+                brands:
+                  type: array
+                  items:
+                    type: string
+            urlscan:
+              type: object
+              properties:
+                score:
+                  type: integer
+                malicious:
+                  type: boolean
+                categories:
+                  type: array
+                  items:
+                    type: string
+            community:
+              type: object
+              properties:
+                score:
+                  type: integer
+                malicious:
+                  type: boolean
+        stats:
+          type: object
+          properties:
+            requests:
+              type: integer
+            dataLength:
+              type: integer
+            uniqIPs:
+              type: integer
+            uniqCountries:
+              type: integer
+
+    SearchResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of matching results.
+        took:
+          type: integer
+          description: Time taken for the search in milliseconds.
+        has_more:
+          type: boolean
+          description: Whether more results are available.
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Scan UUID.
+              task:
+                type: object
+                properties:
+                  time:
+                    type: string
+                    format: date-time
+                  url:
+                    type: string
+                  visibility:
+                    type: string
+                  country:
+                    type: string
+              page:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  domain:
+                    type: string
+                  ip:
+                    type: string
+                  country:
+                    type: string
+                  title:
+                    type: string
+              verdicts:
+                type: object
+                properties:
+                  overall:
+                    type: object
+                    properties:
+                      malicious:
+                        type: boolean
+                      score:
+                        type: integer
+                      categories:
+                        type: array
+                        items:
+                          type: string
