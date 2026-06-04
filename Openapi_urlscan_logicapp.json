@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://prod-223.westeurope.logic.azure.com:443/workflows/80829c1eeda241cb917839bf917543f1/triggers/manual/paths/invoke"
+      "url": "https://prod-223.westeurope.logic.azure.com:443/workflows/80829c1eeda241cb917839bf917543f1/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=fMrtcFYxnNQzd28v2u-ZX1pBOV5Q0LQhJP8Ig7XeWcY"
     }
   ],
   "paths": {
@@ -17,44 +17,7 @@
         "summary": "Scan a URL and automatically retrieve full threat results with retry logic",
         "description": "Use this skill to scan any URL and get its complete threat analysis report in a single call. Submits the URL to URLScan.io, waits for the scan to complete with automatic polling and retry logic, then returns the full verdict, page details, IP, ASN, screenshot URL, and threat categories. Use when a user asks: \"scan this URL and get results\", \"analyze this URL for threats\", \"is this URL malicious?\", \"check this link\", \"scan and report on this URL\", \"run a full urlscan analysis\", or \"scan URL and fetch results\".\n",
         "x-ms-skill-description": "Submits a URL to URLScan.io and automatically retrieves the full threat analysis result with built-in wait and retry logic. Returns verdict, threat score, page info, screenshot URL, and risk categories in one response. Use for prompts like: scan URL and get results, analyze URL for threats, full urlscan analysis, scan and fetch urlscan results, check if URL is malicious.\n",
-        "parameters": [
-          {
-            "name": "api-version",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "2016-10-01"
-            }
-          },
-          {
-            "name": "sp",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "%2Ftriggers%2Fmanual%2Frun"
-            }
-          },
-          {
-            "name": "sv",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "1.0"
-            }
-          },
-          {
-            "name": "sig",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "fMrtcFYxnNQzd28v2u-ZX1pBOV5Q0LQhJP8Ig7XeWcY"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
