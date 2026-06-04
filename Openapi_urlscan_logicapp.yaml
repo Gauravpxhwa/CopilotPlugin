@@ -9,10 +9,10 @@ info:
   version: "1.0"
 
 servers:
-  - url: https://prod-223.westeurope.logic.azure.com:443
+  - url: https://prod-223.westeurope.logic.azure.com:443/workflows/80829c1eeda241cb917839bf917543f1/triggers/manual/paths/invoke
 
 paths:
-  /workflows/80829c1eeda241cb917839bf917543f1/triggers/manual/paths/invoke:
+  /:
     post:
       operationId: ScanURLAndGetResults
       summary: Scan a URL and automatically retrieve full threat results with retry logic
@@ -33,25 +33,25 @@ paths:
       parameters:
         - name: api-version
           in: query
-          required: true
+          required: false
           schema:
             type: string
             default: "2016-10-01"
         - name: sp
           in: query
-          required: true
+          required: false
           schema:
             type: string
             default: "%2Ftriggers%2Fmanual%2Frun"
         - name: sv
           in: query
-          required: true
+          required: false
           schema:
             type: string
             default: "1.0"
         - name: sig
           in: query
-          required: true
+          required: false
           schema:
             type: string
             default: "fMrtcFYxnNQzd28v2u-ZX1pBOV5Q0LQhJP8Ig7XeWcY"
