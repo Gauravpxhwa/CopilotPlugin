@@ -9,13 +9,9 @@ info:
   version: "1.0"
 
 servers:
-  - url: https://prod-223.westeurope.logic.azure.com:443/workflows/80829c1eeda241cb917839bf917543f1/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=fMrtcFYxnNQzd28v2u-ZX1pBOV5Q0LQhJP8Ig7XeWcY
-
-security:
-  - ApiKeyHeader: []
+  - url: https://prod-223.westeurope.logic.azure.com:443
 
 paths:
-
   /workflows/80829c1eeda241cb917839bf917543f1/triggers/manual/paths/invoke:
     post:
       operationId: ScanURLAndGetResults
@@ -46,16 +42,19 @@ paths:
           required: true
           schema:
             type: string
+            default: "%2Ftriggers%2Fmanual%2Frun"
         - name: sv
           in: query
           required: true
           schema:
             type: string
+            default: "1.0"
         - name: sig
           in: query
           required: true
           schema:
             type: string
+            default: "fMrtcFYxnNQzd28v2u-ZX1pBOV5Q0LQhJP8Ig7XeWcY"
       requestBody:
         required: true
         content:
@@ -88,12 +87,6 @@ paths:
           description: Scan timed out after all retries
 
 components:
-  securitySchemes:
-    ApiKeyHeader:
-      type: apiKey
-      in: header
-      name: api-key
-
   schemas:
     LogicAppScanResponse:
       type: object
