@@ -16,7 +16,7 @@ security:
 
 paths:
 
-  /workflows/YOUR-WORKFLOW-ID/triggers/manual/paths/invoke:
+  /workflows/80829c1eeda241cb917839bf917543f1/triggers/manual/paths/invoke:
     post:
       operationId: ScanURLAndGetResults
       summary: Scan a URL and automatically retrieve full threat results with retry logic
