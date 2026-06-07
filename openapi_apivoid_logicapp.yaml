@@ -1,0 +1,369 @@
+openapi: 3.0.1
+info:
+  title: APIVoid Reputation - Logic App
+  description: >
+    All four APIVoid threat intelligence skills — URL reputation, domain reputation,
+    domain age, and IP reputation — with single and batch support via Azure Logic Apps.
+    No infrastructure to manage. All skills return results immediately (synchronous).
+  version: "2.0"
+
+servers:
+  - url: https://prod-XX.eastus.logic.azure.com
+    description: >
+      Replace with your Logic App region base URL. Each path below uses a different
+      Logic App workflow. Update the workflow name in each path if you used custom names.
+
+paths:
+
+  # ════════════════════════════════════════════════════════════
+  #  1. URL REPUTATION — SINGLE
+  # ════════════════════════════════════════════════════════════
+  /workflows/apivoid-url-reputation/triggers/manual/paths/invoke:
+    post:
+      operationId: CheckUrlReputation
+      summary: Check reputation of a single URL
+      description: >
+        Checks a URL against 30+ threat intelligence engines. Returns safety score,
+        risk score, and detection details. Use when asked: "is this URL safe?",
+        "scan this link", "check if this URL is malicious", "is this a phishing URL?",
+        "URL reputation check", "analyse this web address".
+      x-ms-skill-description: >
+        Checks whether a URL is malicious, phishing, spam, or safe against 30+ threat
+        engines. Returns safety score, risk score, and detection details.
+      parameters:
+        - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
+        - { name: sp,          in: query, required: true, schema: { type: string } }
+        - { name: sv,          in: query, required: true, schema: { type: string } }
+        - { name: sig,         in: query, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url: { type: string, description: "Full URL to check e.g. https://example.com/path" }
+      responses:
+        "200":
+          description: URL reputation result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UrlReputationResponse' }
+
+  # ════════════════════════════════════════════════════════════
+  #  2. URL REPUTATION — BATCH
+  # ════════════════════════════════════════════════════════════
+  /workflows/apivoid-url-reputation-batch/triggers/manual/paths/invoke:
+    post:
+      operationId: CheckUrlReputationBatch
+      summary: Check reputation of multiple URLs in one call
+      description: >
+        Checks reputation of multiple URLs in parallel against 30+ threat engines.
+        Returns a result for each URL. Use when asked to check, scan, or analyse a
+        list of URLs, links, or web addresses for malicious or phishing content.
+      x-ms-skill-description: >
+        Batch URL reputation check. Scans multiple URLs in parallel against 30+ threat
+        engines and returns verdict, safety score, and risk score for each URL.
+      parameters:
+        - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
+        - { name: sp,          in: query, required: true, schema: { type: string } }
+        - { name: sv,          in: query, required: true, schema: { type: string } }
+        - { name: sig,         in: query, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [urls]
+              properties:
+                urls:
+                  type: array
+                  items: { type: string }
+                  description: List of URLs to check.
+      responses:
+        "200":
+          description: Batch URL reputation results
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BatchResult' }
+
+  # ════════════════════════════════════════════════════════════
+  #  3. DOMAIN REPUTATION — SINGLE
+  # ════════════════════════════════════════════════════════════
+  /workflows/apivoid-domain-reputation/triggers/manual/paths/invoke:
+    post:
+      operationId: CheckDomainReputation
+      summary: Check reputation of a single domain
+      description: >
+        Checks a domain against 100+ blacklists and threat intelligence feeds.
+        Returns detection count, detection rate, and per-engine breakdown. Use when
+        asked: "is this domain malicious?", "check domain reputation", "is this domain
+        blacklisted?", "domain threat intelligence", "is this domain on a blocklist?".
+      x-ms-skill-description: >
+        Checks a domain against 100+ blacklists and threat feeds. Returns detection
+        ratio and per-engine results. Use for domain reputation or blacklist checks.
+      parameters:
+        - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
+        - { name: sp,          in: query, required: true, schema: { type: string } }
+        - { name: sv,          in: query, required: true, schema: { type: string } }
+        - { name: sig,         in: query, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [host]
+              properties:
+                host: { type: string, description: "Domain name only — no http/https e.g. example.com" }
+      responses:
+        "200":
+          description: Domain reputation result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DomainBlacklistResponse' }
+
+  # ════════════════════════════════════════════════════════════
+  #  4. DOMAIN REPUTATION — BATCH
+  # ════════════════════════════════════════════════════════════
+  /workflows/apivoid-domain-reputation-batch/triggers/manual/paths/invoke:
+    post:
+      operationId: CheckDomainReputationBatch
+      summary: Check reputation of multiple domains in one call
+      description: >
+        Checks multiple domains in parallel against 100+ blacklists and threat feeds.
+        Use when asked to check a list of domains for malicious activity or blacklisting.
+      x-ms-skill-description: >
+        Batch domain reputation check. Scans multiple domains in parallel against 100+
+        threat feeds and returns detection ratio and blacklist results for each domain.
+      parameters:
+        - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
+        - { name: sp,          in: query, required: true, schema: { type: string } }
+        - { name: sv,          in: query, required: true, schema: { type: string } }
+        - { name: sig,         in: query, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hosts]
+              properties:
+                hosts:
+                  type: array
+                  items: { type: string }
+                  description: List of domain names — no http/https.
+      responses:
+        "200":
+          description: Batch domain reputation results
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BatchResult' }
+
+  # ════════════════════════════════════════════════════════════
+  #  5. DOMAIN AGE — SINGLE
+  # ════════════════════════════════════════════════════════════
+  /workflows/apivoid-domain-age/triggers/manual/paths/invoke:
+    post:
+      operationId: CheckDomainAge
+      summary: Check age and registration date of a single domain
+      description: >
+        Returns when a domain was registered, when it expires, and how old it is in
+        days, months, and years. Newly registered domains are commonly used in phishing
+        and malware campaigns. Use when asked: "how old is this domain?", "when was this
+        domain registered?", "is this a newly registered domain?", "domain age lookup".
+      x-ms-skill-description: >
+        Looks up domain registration date, expiration date, and age in days, months,
+        and years. Identifies newly registered domains used in phishing campaigns.
+      parameters:
+        - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
+        - { name: sp,          in: query, required: true, schema: { type: string } }
+        - { name: sv,          in: query, required: true, schema: { type: string } }
+        - { name: sig,         in: query, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [host]
+              properties:
+                host: { type: string, description: "Domain name only — no http/https e.g. example.com" }
+      responses:
+        "200":
+          description: Domain age result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DomainAgeResponse' }
+
+  # ════════════════════════════════════════════════════════════
+  #  6. DOMAIN AGE — BATCH
+  # ════════════════════════════════════════════════════════════
+  /workflows/apivoid-domain-age-batch/triggers/manual/paths/invoke:
+    post:
+      operationId: CheckDomainAgeBatch
+      summary: Check age of multiple domains in one call
+      description: >
+        Looks up registration date and age for multiple domains in parallel. Use when
+        asked to check the age or registration date of a list of domains.
+      x-ms-skill-description: >
+        Batch domain age lookup. Checks registration date and age for multiple domains
+        in parallel. Identifies newly registered domains in bulk.
+      parameters:
+        - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
+        - { name: sp,          in: query, required: true, schema: { type: string } }
+        - { name: sv,          in: query, required: true, schema: { type: string } }
+        - { name: sig,         in: query, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hosts]
+              properties:
+                hosts:
+                  type: array
+                  items: { type: string }
+                  description: List of domain names — no http/https.
+      responses:
+        "200":
+          description: Batch domain age results
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BatchResult' }
+
+  # ════════════════════════════════════════════════════════════
+  #  7. IP REPUTATION — SINGLE
+  # ════════════════════════════════════════════════════════════
+  /workflows/apivoid-ip-reputation/triggers/manual/paths/invoke:
+    post:
+      operationId: CheckIPReputation
+      summary: Check reputation of a single IP address
+      description: >
+        Checks an IP against threat intelligence feeds for malicious activity, open
+        proxies, Tor exit nodes, VPNs, hosting providers, and spam. Use when asked:
+        "is this IP malicious?", "check IP reputation", "is this IP a Tor exit node?",
+        "is this IP a proxy?", "IP threat intelligence", "IP address lookup".
+      x-ms-skill-description: >
+        Checks an IP address against threat feeds for malicious activity, proxies,
+        Tor exit nodes, VPNs, and spam. Returns risk flags and blacklist results.
+      parameters:
+        - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
+        - { name: sp,          in: query, required: true, schema: { type: string } }
+        - { name: sv,          in: query, required: true, schema: { type: string } }
+        - { name: sig,         in: query, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ip]
+              properties:
+                ip: { type: string, description: "IPv4 or IPv6 address to check" }
+      responses:
+        "200":
+          description: IP reputation result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IPReputationResponse' }
+
+  # ════════════════════════════════════════════════════════════
+  #  8. IP REPUTATION — BATCH
+  # ════════════════════════════════════════════════════════════
+  /workflows/apivoid-ip-reputation-batch/triggers/manual/paths/invoke:
+    post:
+      operationId: CheckIPReputationBatch
+      summary: Check reputation of multiple IP addresses in one call
+      description: >
+        Checks multiple IP addresses in parallel against threat intelligence feeds.
+        Returns proxy, Tor, VPN, hosting flags and blacklist results for each IP.
+        Use when asked to check a list of IP addresses for malicious activity.
+      x-ms-skill-description: >
+        Batch IP reputation check. Scans multiple IPs in parallel against threat feeds
+        and returns proxy, Tor, VPN, hosting flags and blacklist results for each IP.
+      parameters:
+        - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
+        - { name: sp,          in: query, required: true, schema: { type: string } }
+        - { name: sv,          in: query, required: true, schema: { type: string } }
+        - { name: sig,         in: query, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ips]
+              properties:
+                ips:
+                  type: array
+                  items: { type: string }
+                  description: List of IPv4 or IPv6 addresses to check.
+      responses:
+        "200":
+          description: Batch IP reputation results
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BatchResult' }
+
+# ── COMPONENTS ──────────────────────────────────────────────────
+components:
+
+  schemas:
+
+    UrlReputationResponse:
+      type: object
+      properties:
+        url:           { type: string }
+        safety_score:  { type: integer, description: "0 (dangerous) to 100 (safe)" }
+        risk_score:    { type: integer, description: "0 (safe) to 100 (high risk)" }
+        detections:    { type: integer }
+        engines_count: { type: integer }
+
+    DomainBlacklistResponse:
+      type: object
+      properties:
+        host:           { type: string }
+        detections:     { type: integer }
+        engines_count:  { type: integer }
+        detection_rate: { type: string }
+
+    DomainAgeResponse:
+      type: object
+      properties:
+        host:                 { type: string }
+        domain_age_found:     { type: boolean }
+        domain_creation_date: { type: string, format: date }
+        domain_expiry_date:   { type: string, format: date }
+        domain_age_in_days:   { type: integer }
+        domain_age_in_months: { type: integer }
+        domain_age_in_years:  { type: integer }
+
+    IPReputationResponse:
+      type: object
+      properties:
+        ip:            { type: string }
+        is_proxy:      { type: boolean }
+        is_tor:        { type: boolean }
+        is_vpn:        { type: boolean }
+        is_hosting:    { type: boolean }
+        detections:    { type: integer }
+        engines_count: { type: integer }
+
+    SingleResult:
+      type: object
+      properties:
+        status: { type: string, enum: [success, failed] }
+        data:   { type: object, nullable: true }
+        error:  { type: string, nullable: true }
+
+    BatchResult:
+      type: object
+      properties:
+        total:   { type: integer }
+        results:
+          type: array
+          items: { $ref: '#/components/schemas/SingleResult' }
