@@ -8,7 +8,7 @@ info:
   version: "2.0"
 
 servers:
-  - url: https://prod-XX.eastus.logic.azure.com
+  - url: https://prod-70.eastus.logic.azure.com
     description: >
       Replace with your Logic App region base URL. Each path below uses a different
       Logic App workflow. Update the workflow name in each path if you used custom names.
