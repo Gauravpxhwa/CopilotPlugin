@@ -32,9 +32,9 @@ paths:
         engines. Returns safety score, risk score, and detection details.
       parameters:
         - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
-        - { name: sp,          in: query, required: true, schema: { type: string } }
-        - { name: sv,          in: query, required: true, schema: { type: string } }
-        - { name: sig,         in: query, required: true, schema: { type: string } }
+        - { name: sp,          in: query, required: true, schema: { type: string, default: "/triggers/manual/run" } }
+        - { name: sv,          in: query, required: true, schema: { type: string, default: "1.0" } }
+        - { name: sig,         in: query, required: true, schema: { type: string, default: "MmMzKlNpoZ1jfzHdD39sjugtFkaSrkBsDiOzDwpHBvw" } }
       requestBody:
         required: true
         content:
@@ -67,9 +67,9 @@ paths:
         engines and returns verdict, safety score, and risk score for each URL.
       parameters:
         - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
-        - { name: sp,          in: query, required: true, schema: { type: string } }
-        - { name: sv,          in: query, required: true, schema: { type: string } }
-        - { name: sig,         in: query, required: true, schema: { type: string } }
+        - { name: sp,          in: query, required: true, schema: { type: string, default: "/triggers/manual/run" } }
+        - { name: sv,          in: query, required: true, schema: { type: string, default: "1.0" } }
+        - { name: sig,         in: query, required: true, schema: { type: string, default: "MmMzKlNpoZ1jfzHdD39sjugtFkaSrkBsDiOzDwpHBvw" } }
       requestBody:
         required: true
         content:
@@ -106,9 +106,9 @@ paths:
         ratio and per-engine results. Use for domain reputation or blacklist checks.
       parameters:
         - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
-        - { name: sp,          in: query, required: true, schema: { type: string } }
-        - { name: sv,          in: query, required: true, schema: { type: string } }
-        - { name: sig,         in: query, required: true, schema: { type: string } }
+        - { name: sp,          in: query, required: true, schema: { type: string, default: "/triggers/manual/run" } }
+        - { name: sv,          in: query, required: true, schema: { type: string, default: "1.0" } }
+        - { name: sig,         in: query, required: true, schema: { type: string, default: "MmMzKlNpoZ1jfzHdD39sjugtFkaSrkBsDiOzDwpHBvw" } }
       requestBody:
         required: true
         content:
@@ -140,9 +140,9 @@ paths:
         threat feeds and returns detection ratio and blacklist results for each domain.
       parameters:
         - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
-        - { name: sp,          in: query, required: true, schema: { type: string } }
-        - { name: sv,          in: query, required: true, schema: { type: string } }
-        - { name: sig,         in: query, required: true, schema: { type: string } }
+        - { name: sp,          in: query, required: true, schema: { type: string, default: "/triggers/manual/run" } }
+        - { name: sv,          in: query, required: true, schema: { type: string, default: "1.0" } }
+        - { name: sig,         in: query, required: true, schema: { type: string, default: "MmMzKlNpoZ1jfzHdD39sjugtFkaSrkBsDiOzDwpHBvw" } }
       requestBody:
         required: true
         content:
@@ -179,9 +179,9 @@ paths:
         and years. Identifies newly registered domains used in phishing campaigns.
       parameters:
         - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
-        - { name: sp,          in: query, required: true, schema: { type: string } }
-        - { name: sv,          in: query, required: true, schema: { type: string } }
-        - { name: sig,         in: query, required: true, schema: { type: string } }
+        - { name: sp,          in: query, required: true, schema: { type: string, default: "/triggers/manual/run" } }
+        - { name: sv,          in: query, required: true, schema: { type: string, default: "1.0" } }
+        - { name: sig,         in: query, required: true, schema: { type: string, default: "MmMzKlNpoZ1jfzHdD39sjugtFkaSrkBsDiOzDwpHBvw" } }
       requestBody:
         required: true
         content:
@@ -213,9 +213,9 @@ paths:
         in parallel. Identifies newly registered domains in bulk.
       parameters:
         - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
-        - { name: sp,          in: query, required: true, schema: { type: string } }
-        - { name: sv,          in: query, required: true, schema: { type: string } }
-        - { name: sig,         in: query, required: true, schema: { type: string } }
+        - { name: sp,          in: query, required: true, schema: { type: string, default: "/triggers/manual/run" } }
+        - { name: sv,          in: query, required: true, schema: { type: string, default: "1.0" } }
+        - { name: sig,         in: query, required: true, schema: { type: string, default: "MmMzKlNpoZ1jfzHdD39sjugtFkaSrkBsDiOzDwpHBvw" } }
       requestBody:
         required: true
         content:
@@ -252,9 +252,9 @@ paths:
         Tor exit nodes, VPNs, and spam. Returns risk flags and blacklist results.
       parameters:
         - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
-        - { name: sp,          in: query, required: true, schema: { type: string } }
-        - { name: sv,          in: query, required: true, schema: { type: string } }
-        - { name: sig,         in: query, required: true, schema: { type: string } }
+        - { name: sp,          in: query, required: true, schema: { type: string, default: "/triggers/manual/run" } }
+        - { name: sv,          in: query, required: true, schema: { type: string, default: "1.0" } }
+        - { name: sig,         in: query, required: true, schema: { type: string, default: "MmMzKlNpoZ1jfzHdD39sjugtFkaSrkBsDiOzDwpHBvw" } }
       requestBody:
         required: true
         content:
@@ -287,9 +287,9 @@ paths:
         and returns proxy, Tor, VPN, hosting flags and blacklist results for each IP.
       parameters:
         - { name: api-version, in: query, required: true, schema: { type: string, default: "2016-10-01" } }
-        - { name: sp,          in: query, required: true, schema: { type: string } }
-        - { name: sv,          in: query, required: true, schema: { type: string } }
-        - { name: sig,         in: query, required: true, schema: { type: string } }
+        - { name: sp,          in: query, required: true, schema: { type: string, default: "/triggers/manual/run" } }
+        - { name: sv,          in: query, required: true, schema: { type: string, default: "1.0" } }
+        - { name: sig,         in: query, required: true, schema: { type: string, default: "MmMzKlNpoZ1jfzHdD39sjugtFkaSrkBsDiOzDwpHBvw" } }
       requestBody:
         required: true
         content:
