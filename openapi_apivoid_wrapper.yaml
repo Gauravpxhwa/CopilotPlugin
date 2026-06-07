@@ -8,7 +8,7 @@ info:
   version: "2.0"
 
 servers:
-  - url: https://YOUR-APP-NAME.azurewebsites.net
+  - url: https://copilot-apivoid-plugin-hufvg5b4hfg7hygj.eastus-01.azurewebsites.net
     description: Replace with your Azure App Service URL
 
 security:
