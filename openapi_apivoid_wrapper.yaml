@@ -8,7 +8,7 @@ info:
   version: "2.0"
 
 servers:
-  - url: https://copilot-apivoid-plugin-hufvg5b4hfg7hygj.eastus-01.azurewebsites.net
+  - url: https://YOUR-APP-NAME.azurewebsites.net
     description: Replace with your Azure App Service URL
 
 security:
@@ -58,11 +58,11 @@ paths:
       operationId: CheckUrlReputationBatch
       summary: Check reputation of multiple URLs in one call
       description: >
-        Checks reputation of up to 10 URLs in parallel against 30+ threat engines.
+        Checks reputation of multiple URLs in parallel against 30+ threat engines.
         Returns a result for each URL. Use when asked to check, scan, or analyse
         a list of URLs, links, or web addresses for malicious or phishing content.
       x-ms-skill-description: >
-        Batch URL reputation check — scans up to 10 URLs in parallel against 30+
+        Batch URL reputation check — scans multiple URLs in parallel against 30+
         threat engines and returns verdict, safety score, and risk score for each.
       requestBody:
         required: true
@@ -75,8 +75,7 @@ paths:
                 urls:
                   type: array
                   items: { type: string }
-                  maxItems: 10
-                  description: List of URLs to check (max 10).
+                  description: List of URLs to check (any number).
       responses:
         "200":
           description: Batch URL reputation results
@@ -129,11 +128,11 @@ paths:
       operationId: CheckDomainReputationBatch
       summary: Check reputation of multiple domains in one call
       description: >
-        Checks up to 10 domains in parallel against 100+ blacklists and threat feeds.
+        Checks multiple domains in parallel against 100+ blacklists and threat feeds.
         Returns a result for each domain. Use when asked to check a list of domains
         for malicious activity, blacklisting, or threat intelligence.
       x-ms-skill-description: >
-        Batch domain reputation check — scans up to 10 domains in parallel against
+        Batch domain reputation check — scans multiple domains in parallel against
         100+ threat feeds and returns detection ratio and blacklist results for each.
       requestBody:
         required: true
@@ -146,8 +145,7 @@ paths:
                 hosts:
                   type: array
                   items: { type: string }
-                  maxItems: 10
-                  description: List of domain names to check (max 10, no http/https).
+                  description: List of domain names to check (no http/https).
       responses:
         "200":
           description: Batch domain reputation results
@@ -201,11 +199,11 @@ paths:
       operationId: CheckDomainAgeBatch
       summary: Check age of multiple domains in one call
       description: >
-        Looks up age and registration date for up to 10 domains in parallel.
+        Looks up age and registration date for multiple domains in parallel.
         Returns registration date, expiration, and age for each domain. Use when
         asked to check the age or registration date of a list of domains.
       x-ms-skill-description: >
-        Batch domain age lookup — checks registration date and age for up to 10
+        Batch domain age lookup — checks registration date and age for multiple
         domains in parallel. Identifies newly registered domains in bulk.
       requestBody:
         required: true
@@ -218,8 +216,7 @@ paths:
                 hosts:
                   type: array
                   items: { type: string }
-                  maxItems: 10
-                  description: List of domain names to check (max 10, no http/https).
+                  description: List of domain names to check (no http/https).
       responses:
         "200":
           description: Batch domain age results
@@ -272,12 +269,12 @@ paths:
       operationId: CheckIPReputationBatch
       summary: Check reputation of multiple IP addresses in one call
       description: >
-        Checks up to 10 IP addresses in parallel against threat intelligence feeds.
+        Checks multiple IP addresses in parallel against threat intelligence feeds.
         Returns proxy, Tor, VPN, hosting flags and blacklist results for each IP.
         Use when asked to check a list of IP addresses for malicious activity or
         threat intelligence.
       x-ms-skill-description: >
-        Batch IP reputation check — scans up to 10 IPs in parallel against threat
+        Batch IP reputation check — scans multiple IPs in parallel against threat
         feeds and returns proxy, Tor, VPN, hosting flags and blacklist results for each.
       requestBody:
         required: true
@@ -290,8 +287,7 @@ paths:
                 ips:
                   type: array
                   items: { type: string }
-                  maxItems: 10
-                  description: List of IPv4 or IPv6 addresses to check (max 10).
+                  description: List of IPv4 or IPv6 addresses to check (any number).
       responses:
         "200":
           description: Batch IP reputation results
