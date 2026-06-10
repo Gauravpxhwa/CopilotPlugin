@@ -9,7 +9,7 @@ info:
 
 servers:
   - url: https://copilot-apivoid-plugin-hufvg5b4hfg7hygj.eastus-01.azurewebsites.net
-    description: Replace with your Azure App Service URL
+    description: APIVoid wrapper App Service
 
 security:
   - ApiKeyHeader: []
